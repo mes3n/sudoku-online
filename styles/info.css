@@ -1,0 +1,129 @@
+.infocon {
+    margin-top: 56px;
+    width: 50%;
+}
+
+@media only screen and (min-width: 786px) and (max-width: 1025px) {
+    .infocon {
+        margin-top: 24px;
+        width: 95%;
+    }
+
+    ul.mini-board {
+        width: 45%;
+    }
+
+    ul.mini-board>li.tile {
+        font-size: 200%;
+    }
+
+    span.box {
+        width: 32px;
+    }
+
+    p.info {
+        font-size: 14px;
+    }
+}
+
+.info-boards {
+    display: flex;
+    flex-wrap: wrap;
+    /* justify-content: space-between; */
+}
+
+ul.mini-board {
+    display: grid;
+    grid-template-rows: repeat(9, 1fr);
+    grid-template-columns: repeat(9, 1fr);
+
+    width: 30%;
+    aspect-ratio: 1;
+    overflow: hidden;
+
+    border: 2px solid var(--line-color);
+    border-radius: 16px;
+
+    margin: 16px;
+}
+
+ul.mini-board:first-of-type {
+    margin-left: 0;
+}
+
+ul.mini-board>li.tile {
+    font-size: 125%;
+    text-align: center;
+
+    box-sizing: border-box;
+    border-right: 1px solid var(--line-color);
+    border-bottom: 1px solid var(--line-color);
+}
+
+h1.info {
+    font-size: 40px;
+}
+
+h2.info {
+    font-size: 28px;
+    margin-top: 24px;
+}
+
+h3.info {
+    font-size: 20px;
+    margin-top: 12px;
+}
+
+h2.info+h3.info {
+    margin-top: 0;
+}
+
+p.info {
+    font-size: 16px;
+}
+
+p.info:last-child {
+    margin-bottom: 128px;
+}
+
+span.box {
+    display: inline-block;
+
+    background-color: var(--select);
+    aspect-ratio: 1;
+    width: 16px;
+
+    box-sizing: border-box;
+    border: 1px solid var(--line-color);
+    border-radius: 2px;
+}
+
+ul.mini-board>li.tile:nth-child(9n - 6),
+ul.mini-board>li.tile:nth-child(9n - 3) {
+    border-right: 2px solid var(--line-color);
+}
+
+ul.mini-board>li.tile:nth-child(n + 19):nth-child(-n + 27),
+ul.mini-board>li.tile:nth-child(n + 46):nth-child(-n + 54) {
+    border-bottom: 2px solid var(--line-color);
+}
+
+ul.mini-board>li.tile:nth-child(9n - 0) {
+    border-right: none;
+}
+
+ul.mini-board>li.tile:nth-child(n + 73):nth-child(-n + 81) {
+    border-bottom: none;
+}
+
+ul.mini-board>li[class*="tile highlighted"] {
+    background-color: var(--highlight);
+}
+
+ul.mini-board>li[class*="tile right"] {
+    background-color: var(--right);
+}
+
+ul.mini-board>li[class*="tile wrong"] {
+    background-color: var(--wrong);
+}

@@ -1,0 +1,123 @@
+* {
+    margin: 0;
+    padding: 0;
+
+    font-family: 'Roboto Slab', serif;
+
+    --nav-background: #374137;
+    --nav-text-color: #c98cb1;
+
+    --root-background: #eff3f2;
+    --root-overlay: #C9CCCE;
+
+    --line-color: #3b3c3d;
+
+    --wrong: #b88686;
+    --right: #86b88b;
+
+    --highlight: #d8e3ec;
+    --select: #c5dac7;
+}
+
+a,
+button {
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+ul {
+    list-style: none;
+}
+
+:root {
+    background: var(--root-background);
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+
+    background: var(--nav-background);
+
+    padding: 4px;
+}
+
+@media only screen and (min-width: 786px) and (max-width: 1025px) {
+    .logo {
+        font-size: 72px;
+    }
+
+    li.nav-item {
+        font-size: 56px;
+        border-width: 4px;
+    }
+}
+
+.logo {
+    color: var(--nav-text-color);
+
+    font-size: 56px;
+    margin: 8px;
+
+    display: flex;
+    align-items: center;
+
+    @media (min-width: 786px) {
+        font-size: 72px;
+    }
+}
+
+.icon {
+    margin-left: 16px;
+
+    background-image: url(/images/sudoku-pink.svg);
+    background-size: contain;
+
+    width: 56px;
+    height: 56px;
+}
+
+ul.nav-items {
+    display: flex;
+    align-items: center;
+
+    box-sizing: border-box;
+    list-style: none;
+}
+
+li.nav-item {
+    padding: 4px 8px;
+    margin-right: 32px;
+
+    border: 2px solid transparent;
+    border-radius: 2px;
+
+    font-size: 32px;
+
+    @media (min-width: 786px) {
+        font-size: 56px;
+        border-width: 4px;
+    }
+}
+
+@keyframes select {
+    100% {
+        border-color: var(--nav-text-color);
+    }
+}
+
+li[class*="nav-item selected"] {
+    animation: select 0.2s ease-in-out forwards;
+}
+
+li.nav-item a {
+    color: var(--nav-text-color);
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+}
