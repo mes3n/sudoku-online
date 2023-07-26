@@ -3,13 +3,12 @@ import View from './view.js'
 export default class Info extends View {
     constructor() {
         super()
+
+        this.html = fetch("/pages/info.html").then(response => response.text())
     }
 
     async getHtml() {
-        const response = await fetch("/pages/info.html")
-        const data = await response.text()
-
-        return data
+        return this.html
     }
 
     async configure() {

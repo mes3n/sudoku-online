@@ -22,13 +22,12 @@ export default class Board extends View {
 
         this.working = false
         this.animationIteration = 0
+
+        this.html = fetch("/pages/board.html").then(response => response.text())
     }
 
     async getHtml() {
-        const response = await fetch("/pages/board.html")
-        const data = await response.text()
-
-        return data
+        return this.html
     }
 
     async configure() {
@@ -165,9 +164,9 @@ export default class Board extends View {
         document.getElementById('lvl').addEventListener('change', e => {
             this.lvl = e.target.value
             document.getElementById('lvltxt').innerText = `${this.lvl > 36 ? 'Easy' :
-                    this.lvl > 32 ? 'Medium' :
-                        this.lvl > 28 ? 'Hard' :
-                            'Evil'
+                this.lvl > 32 ? 'Medium' :
+                    this.lvl > 28 ? 'Hard' :
+                        'Evil'
                 } (${this.lvl} Digits)`
         })
     }
@@ -299,8 +298,10 @@ export default class Board extends View {
     }
 
     async countSolutions(max) {
+        const cpy = [...this.board]
         this.solutions = 0
         await this.fillBoard(false, true, max)
+        this.board = cpy
         return this.solutions
     }
 
@@ -315,6 +316,8 @@ export default class Board extends View {
             if (positions.length === 0) return
 
             shuffle(positions)
+
+            console.log("what")
 
             for (const i of positions.slice(0, 5)) {  // only try 5 at a time
                 const cpy = [...this.board]
@@ -344,6 +347,33 @@ export default class Board extends View {
         }
     }
 
+    async setRemainingNums2(count) {
+        let positions = this.board.map((val, i) => {
+            if (val != 0)
+                return i
+        })
+        // let positions = Array.from({length: this.board.length}, (_, i) => i)
+
+        shuffle(positions)
+        positions = positions.slice(0, this.board.length - count)
+
+        let values = positions.map(p => this.board[p])
+        positions.forEach(p => this.board[p] = 0)
+
+        await this.updateBoard()
+
+        for (let i = 0; await this.countSolutions(2) > 1; i++) {
+            this.board[positions[i]] = values[i]
+
+            if (this.visualAlgorithm) {
+                await this.updateTile(positions[i], values[i])
+            }
+            await new Promise(r => setTimeout(r, 2))
+
+            console.log(positions[i], values[i])
+        }
+    }
+
     async solve() {
         if (this.working)
             return
@@ -370,7 +400,7 @@ export default class Board extends View {
         this.working = true
         this.loading(true)
         await this.fillBoard(true)
-        await this.setRemainingNums(this.lvl)
+        await this.setRemainingNums2(this.lvl)
         this.updateBoard()
         this.loading(false)
         this.working = false

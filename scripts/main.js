@@ -1,3 +1,7 @@
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./serviceworker.js')
+}
+
 import Board from './board.js'
 import Info from './info.js'
 

@@ -1,0 +1,11 @@
+{
+    "name": "Sudoku",
+    "start_url": "./",
+    "display": "fullscreen",
+    "icons": [
+        {
+            "src": "images/sudoku-white.svg",
+            "sizes": "any"
+        }
+    ]
+}
