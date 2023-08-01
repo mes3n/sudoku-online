@@ -3,29 +3,6 @@
     width: 50%;
 }
 
-@media only screen and (min-width: 786px) and (max-width: 1025px) {
-    .infocon {
-        margin-top: 24px;
-        width: 95%;
-    }
-
-    ul.mini-board {
-        width: 45%;
-    }
-
-    ul.mini-board>li.tile {
-        font-size: 200%;
-    }
-
-    span.box {
-        width: 32px;
-    }
-
-    p.info {
-        font-size: 14px;
-    }
-}
-
 .info-boards {
     display: flex;
     flex-wrap: wrap;
@@ -96,6 +73,29 @@ span.box {
     box-sizing: border-box;
     border: 1px solid var(--line-color);
     border-radius: 2px;
+}
+
+@media only screen and (min-width: 786px) and (max-width: 1025px) {
+    .infocon {
+        margin-top: 24px;
+        width: 95%;
+    }
+
+    ul.mini-board {
+        width: 45%;
+    }
+
+    ul.mini-board>li.tile {
+        font-size: 200%;
+    }
+
+    span.box {
+        width: 32px;
+    }
+
+    p.info {
+        font-size: 14px;
+    }
 }
 
 ul.mini-board>li.tile:nth-child(9n - 6),

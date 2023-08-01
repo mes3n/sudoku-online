@@ -13,47 +13,56 @@ export default class Board extends View {
         super()
 
         this.board = Array.from({ length: 81 }, _ => 0)
+        this.solution = [...this.board]
+
         this.activeTile = null
         this.solutions = 0
 
         this.visualAlgorithm = false
+        this.validatedInput = false
         this.guidedInput = false
         this.lvl = 30
 
         this.working = false
         this.animationIteration = 0
 
-        this.html = fetch("/pages/board.html").then(response => response.text())
+        this.html = fetch('/pages/board.html').then(response => response.text())
     }
 
     async getHtml() {
-        return this.html
+        return await this.html
     }
 
     async configure() {
-        document.querySelectorAll("#board li").forEach((li, i) => {
+        document.querySelectorAll('#board li').forEach((li, i) => {
             li.addEventListener('click', () => {
                 if (this.activeTile === li) {
-                    this.activeTile.className = "tile"
+                    this.activeTile.className = 'tile'
                     this.activeTile = null
                     return
                 }
                 if (this.activeTile !== null)
-                    this.activeTile.className = "tile"
+                    this.activeTile.className = 'tile'
                 this.activeTile = li
-                this.activeTile.className = "tile selected"
+                this.activeTile.className = 'tile selected'
 
-                document.getElementById("num").focus()
+                document.getElementById('num').focus()
             })
             li.id = i
 
             let x = (i % 9),
                 y = Math.floor(i / 9)
 
-            li.style.animation = `enter 500ms ease-in-out ${Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) * 100}ms, 
-                                  enter 500ms ease-in-out ${Math.sqrt(Math.pow(9 - x, 2) + Math.pow(9 - y, 2)) * 100}ms`
+            if (x + y === 9) {
+                const d1 = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)), 
+                      d2 = Math.sqrt(Math.pow(9 - x, 2) + Math.pow(9 - y, 2))
+                li.style.animation = `enter ${500 + Math.abs(d1 - d2) * 100}ms ease-in-out ${Math.min(d1, d2) * 100}ms`
+            } else {
+                li.style.animation = `enter 500ms ease-in-out ${Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) * 100}ms, 
+                                      enter 500ms ease-in-out ${Math.sqrt(Math.pow(9 - x, 2) + Math.pow(9 - y, 2)) * 100}ms`
+            }
         })
-        document.querySelectorAll("#board li")[40].addEventListener('animationiteration', () => {
+        document.querySelectorAll('#board li')[40].addEventListener('animationiteration', () => {
             this.animationIteration += 1
         })
 
@@ -68,47 +77,66 @@ export default class Board extends View {
 
                 this.activeTile.innerText = e.key
                 this.board[i] = n
-                if (!this.guidedInput)
-                    return
 
-                this.activeTile.style.animation = "unset"
-                this.activeTile.offsetHeight
-                if ((await this.validValues(i)).indexOf(n) < 0) {  // the input is invalid
-                    this.activeTile.style.animation = "wrong 400ms ease-in-out"
-                    console.log("wrong")
-                } else {  // the input is valid
-                    this.activeTile.style.animation = "right 400ms ease-in-out"
-                    console.log("right")
+                if (this.validatedInput) {
+                    if (this.solution.every(n => n === 0))
+                        return
+                    this.activeTile.style.animation = 'unset'
+                    this.activeTile.offsetHeight
+                    if (this.solution[i] === n) {  // correct
+                        this.activeTile.style.animation = 'right 800ms ease-in-out'
+                        console.log('very right')
+                    }
+                    else {  // wrong
+                        this.activeTile.style.animation = 'wrong 800ms ease-in-out infinite'
+                        console.log('very wrong')
+                    }
                 }
+
+                else if (this.guidedInput) {
+                    this.activeTile.style.animation = 'unset'
+                    this.activeTile.offsetHeight
+                    if ((await this.validValues(i)).indexOf(n) < 0) {  // the input is invalid
+                        this.activeTile.style.animation = 'wrong 400ms ease-in-out'
+                        console.log('wrong')
+                    } else {  // the input is valid
+                        this.activeTile.style.animation = 'right 400ms ease-in-out'
+                        console.log('right')
+                    }
+                }
+
+                return
             }
 
-            if (e.key === "Backspace" || e.key === "Delete") {
-                this.activeTile.innerText = ""
+            else if (e.key === 'Backspace' || e.key === 'Delete') {
+                this.activeTile.innerText = ''
+                this.activeTile.style.animation = 'unset'
+                this.activeTile.offsetHeight
                 this.board[Number.parseInt(this.activeTile.id)] = 0
                 return
             }
 
-            if (e.key === "Escape") {
-                this.activeTile.className = "tile"
+            else if (e.key === 'Escape') {
+                this.activeTile.className = 'tile'
                 this.activeTile = null
                 return
             }
 
             let diff = (() => {
                 switch (e.key) {
-                    case "Tab":
-                    case "ArrowRight":
-                    case "d":
+                    case 'Tab':
+                    case 'ArrowRight':
+                    case 'd':
                         return 1
-                    case " ":
-                    case "ArrowDown":
-                    case "s":
+                    case ' ':
+                    case 'ArrowDown':
+                    case 's':
                         return 9
-                    case "ArrowLeft":
-                    case "a":
+                    case 'ArrowLeft':
+                    case 'a':
                         return -1
-                    case "ArrowUp":
-                    case "w":
+                    case 'ArrowUp':
+                    case 'w':
                         return -9
                     default:
                         return 0
@@ -118,18 +146,16 @@ export default class Board extends View {
             if (!diff)
                 return
 
-            if (e.shiftKey && (e.key === " " || e.key === "Tab"))
+            if (e.shiftKey && (e.key === ' ' || e.key === 'Tab'))
                 diff = -diff
 
-            const ul = Array.from(document.querySelectorAll("#board li"))
-            this.activeTile.className = "tile"
+            const ul = Array.from(document.querySelectorAll('#board li'))
+            this.activeTile.className = 'tile'
             this.activeTile = ul[(((Number.parseInt(this.activeTile.id) + diff) % ul.length) + ul.length) % ul.length]
-            this.activeTile.className = "tile selected"
+            this.activeTile.className = 'tile selected'
         })
 
-        await this.updateBoard()
-
-        Array.from(document.getElementsByClassName("control")).forEach(btn => {
+        Array.from(document.getElementsByClassName('control')).forEach(btn => {
             if (btn.id === 'gen') {
                 btn.addEventListener('click', () => this.generate())
             } else if (btn.id === 'sol') {
@@ -140,13 +166,8 @@ export default class Board extends View {
         })
 
         document.getElementById('valg').checked = this.visualAlgorithm
+        document.getElementById('vali').checked = this.validatedInput
         document.getElementById('help').checked = this.guidedInput
-        document.getElementById('lvl').value = this.lvl
-        document.getElementById('lvltxt').innerText = `${this.lvl > 36 ? 'Easy' :
-            this.lvl > 32 ? 'Medium' :
-                this.lvl > 28 ? 'Hard' :
-                    'Evil'
-            } (${this.lvl} Digits)`
 
         document.getElementById('valg').addEventListener('click', e => {
             this.visualAlgorithm = e.target.checked
@@ -157,33 +178,40 @@ export default class Board extends View {
             }
         })
 
+        document.getElementById('vali').addEventListener('click', e => {
+            this.validatedInput = e.target.checked
+        })
+
         document.getElementById('help').addEventListener('click', e => {
             this.guidedInput = e.target.checked
         })
 
-        document.getElementById('lvl').addEventListener('change', e => {
-            this.lvl = e.target.value
+        const updateSlider = () => {
+            document.getElementById('lvl').value = this.lvl
             document.getElementById('lvltxt').innerText = `${this.lvl > 36 ? 'Easy' :
                 this.lvl > 32 ? 'Medium' :
                     this.lvl > 28 ? 'Hard' :
                         'Evil'
                 } (${this.lvl} Digits)`
+        }
+        updateSlider()
+        document.getElementById('lvl').addEventListener('input', e => {
+            this.lvl = e.target.value
+            updateSlider()
         })
-    }
 
-    // async getDiff() {
-    //     return document.getElementById('lvl').value
-    // }
+        await this.updateBoard()
+    }
 
     async loading(starting) {
         if (starting)
             this.animationIteration = 0
-        document.querySelectorAll("#board li").forEach((li, i) => {
+        document.querySelectorAll('#board li').forEach((li, i) => {
             if (starting) {
                 let x = (i % 9) - 4,
-                    y = Math.floor(i / 9) - 4
+                    y = (i / 9) - 4
 
-                li.style.animation = "unset"
+                li.style.animation = 'unset'
                 li.offsetHeight
                 li.style.animation = `loading 800ms ease-in-out ${Math.sqrt(x * x + y * y) * 100}ms infinite`
 
@@ -194,7 +222,7 @@ export default class Board extends View {
     }
 
     async updateBoard(val) {
-        document.querySelectorAll("#board li").forEach((li, i) => {
+        document.querySelectorAll('#board li').forEach((li, i) => {
             li.innerText = val || (this.board[i] === 0 ? '' : this.board[i])
         })
     }
@@ -268,10 +296,13 @@ export default class Board extends View {
         for (let i = 0; i < this.board.length; i++) {
             if (this.board[i] === 0) {
                 for (const n of await this.validValues(i, generating)) {
+                    if (counting && this.solution[i] === n)
+                        continue
+
                     this.board[i] = n
-                    if (!counting && this.visualAlgorithm) {
+                    // if (!counting && this.visualAlgorithm)
+                    if (this.visualAlgorithm)
                         await this.updateTile(i, n)
-                    }
                     if (await this.fillBoard(generating, counting, max))
                         return true
                 }
@@ -285,7 +316,7 @@ export default class Board extends View {
         if (!counting)
             return true
         this.solutions += 1
-        return !(this.solutions < max)  // keep looking for solutions if not at limit
+        return this.solutions >= max  // keep looking for solutions if not at limit
     }
 
     async countValues() {
@@ -297,7 +328,7 @@ export default class Board extends View {
         return count
     }
 
-    async countSolutions(max) {
+    async countExtraSolutions(max) {
         const cpy = [...this.board]
         this.solutions = 0
         await this.fillBoard(false, true, max)
@@ -305,7 +336,7 @@ export default class Board extends View {
         return this.solutions
     }
 
-    async setRemainingNums(count) {
+    async setRemainingNumsOld(count) {
         let constants = []
         while (await this.countValues() > count) {
             let positions = []  // all positions with a value
@@ -317,17 +348,15 @@ export default class Board extends View {
 
             shuffle(positions)
 
-            console.log("what")
-
             for (const i of positions.slice(0, 5)) {  // only try 5 at a time
                 const cpy = [...this.board]
                 this.board[i] = 0
 
                 if (this.visualAlgorithm) {
-                    await this.updateTile(i, "")
+                    await this.updateTile(i, '')
                 }
 
-                if (await this.countSolutions(2) > 1) {  // there are 2 or more solutions -> invalid board -> redo
+                if (await this.countExtraSolutions(1) > 0) {  // there are 2 or more solutions -> invalid board -> redo
                     this.board = cpy
                     constants.push(i)
 
@@ -340,14 +369,13 @@ export default class Board extends View {
                     this.board[i] = 0
                 }
 
-                console.log("here")
                 await new Promise(r => setTimeout(r, 2))
                 if (await this.countValues() <= count) return
             }
         }
     }
 
-    async setRemainingNums2(count) {
+    async setRemainingNums(count) {
         let positions = this.board.map((val, i) => {
             if (val != 0)
                 return i
@@ -360,9 +388,10 @@ export default class Board extends View {
         let values = positions.map(p => this.board[p])
         positions.forEach(p => this.board[p] = 0)
 
-        await this.updateBoard()
+        if (this.visualAlgorithm)
+            await this.updateBoard()
 
-        for (let i = 0; await this.countSolutions(2) > 1; i++) {
+        for (let i = 0; await this.countExtraSolutions(1) > 0; i++) {
             this.board[positions[i]] = values[i]
 
             if (this.visualAlgorithm) {
@@ -378,7 +407,7 @@ export default class Board extends View {
         if (this.working)
             return
         if (!await this.validBoard()) {
-            console.log("invalid")
+            console.log('invalid')
             return
         }
         this.working = true
@@ -394,16 +423,17 @@ export default class Board extends View {
         if (this.working)
             return
         if (!await this.validBoard()) {
-            console.log("invalid")
+            console.log('invalid')
             return
         }
         this.working = true
         this.loading(true)
         await this.fillBoard(true)
-        await this.setRemainingNums2(this.lvl)
+        this.solution = [...this.board]
+        await this.setRemainingNums(this.lvl)
         this.updateBoard()
-        this.loading(false)
         this.working = false
+        this.loading(false)
     }
 
     async clearBoard() {
@@ -411,6 +441,7 @@ export default class Board extends View {
             return
         this.working = true
         this.board = Array.from({ length: 81 }, _ => 0)
+        this.solution = [...this.board]
         await this.updateBoard()
         this.working = false
     }

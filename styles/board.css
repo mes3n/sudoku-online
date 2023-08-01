@@ -1,3 +1,7 @@
+* {
+    overflow-x: visible;
+}
+
 .board-wrapper {
     all: inherit;
     width: 100%;
@@ -27,11 +31,49 @@ ul.board>li.tile {
 
 .difficulty-wrapper {
     all: inherit;
-    /* width: 100%; */
 }
 
 input.difficulty {
     width: 90%;
+
+    -webkit-appearance: none;
+    appearance: none;
+
+    background-color: var(--root-overlay);
+
+    height: 20px;
+    border-radius: 10px;
+
+    box-shadow: 0 0 4px -2px var(--line-color);
+
+    margin-bottom: 8px;
+}
+
+input.difficulty::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+
+    aspect-ratio: 1;
+    width: 32px;
+
+    border-radius: 16px;
+
+    background: var(--line-color);
+
+    cursor: pointer;
+}
+
+input.difficulty::-moz-range-thumb {
+    appearance: none;
+    background: var(--line-color);
+
+    border: none;
+
+    height: 20px;
+    width: 20px;
+
+    border-radius: 20px;
+    cursor: pointer;
 }
 
 .difficulty-wrapper>p.difficulty {
@@ -59,6 +101,11 @@ input.difficulty {
 
     .difficulty-wrapper>p.difficulty {
         font-size: 20px;
+    }
+
+    input.difficulty {
+        height: 12px;
+        border-radius: 6px;
     }
 }
 
@@ -108,7 +155,7 @@ ul.board>li.tile:not(.selected):hover {
     background-color: #e2eee4;
 }
 
-ul.board>li[class*="tile selected"] {
+ul.board>li.tile.selected {
     background-color: #c5dac7;
 }
 
@@ -124,6 +171,13 @@ ul.board>li[class*="tile selected"] {
     margin-bottom: 16px;
 }
 
+@media only screen and (min-width: 1025px) {
+    .control-group.checkboxes {
+        justify-content: center;
+        gap: 16px;
+    }
+}
+
 .control-group:last-child {
     margin-bottom: 0;
 }
@@ -133,19 +187,77 @@ p.control {
     all: unset;
 
     min-width: 20%;
-    min-height: 5%;
     padding: 8px;
 
+    /* background-color: var(--root-overlay); */
     background-color: var(--root-overlay);
     color: var(--line-color);
 
-    border: 1px solid var(--line-color);
-    border-radius: 4px;
+    /* border: 1px solid var(--nav-background); */
+    transition: box-shadow 100ms;
+    box-shadow: 1px 1px 4px -2px var(--nav-background), inset 0 0 0 var(--nav-background);
+    border-radius: 12px;
 
     font-size: 24px;
     text-align: center;
 
+    cursor: pointer;
     -webkit-tap-highlight-color: transparent;
+}
+
+p.control {
+    position: relative;
+
+    border-radius: 24px;
+    box-shadow: 1px 1px 4px -2px var(--nav-background);
+}
+
+.checkbox {
+    display: inline-block;
+    margin-right: 8px;
+
+    aspect-ratio: 1;
+    width: 32px;
+
+    background-color: var(--root-overlay);
+    box-shadow: inset 0 0 4px -2px var(--line-color);
+    border-radius: 16px;
+
+    vertical-align: middle;
+
+    transition: background-color 200ms, filter 200ms;
+}
+
+.control:hover input[type='checkbox']~.checkbox {
+    filter: brightness(90%);
+}
+
+.control input[type='checkbox']:checked~.checkbox {
+    background-color: var(--nav-text-color);
+}
+
+.control .checkbox:after {
+    content: '';
+    display: none;
+}
+
+.control input[type='checkbox']:checked~.checkbox:after {
+    display: block;
+}
+
+.control .checkbox:after {
+    margin: 6px 10.5px;
+
+    width: 9px;
+    height: 18px;
+    box-sizing: border-box;
+    border: solid var(--root-overlay);
+    border-width: 0 4px 4px 0;
+    transform: rotate(45deg);
+}
+
+button.control:active {
+    box-shadow: 0 0 0 var(--nav-background), inset 1px 1px 4px -2px var(--nav-background);
 }
 
 @media only screen and (max-width: 1025px) {
@@ -174,32 +286,25 @@ p.control {
     }
 }
 
-button.control {
-    border-bottom: 2px solid var(--line-color);
-    border-right: 2px solid var(--line-color);
-
-    cursor: pointer;
-}
-
-input.control[type='checkbox'] {
-    /* -webkit-appearance: none; */
-
-    margin-right: 8px;
-
-    width: 24px;
-    aspect-ratio: 1;
-}
-
-button.control:active {
-    border: 1px solid var(--line-color);
-    border-top: 2px solid var(--line-color);
-    border-left: 2px solid var(--line-color);
-}
-
-input[type='number'] {
-    position: absolute;
+#num {
     font-size: 64px;
+    border: none;
     opacity: 0;
     height: 0;
     width: 0;
+}
+
+.control input[type='checkbox'] {
+    position: absolute;
+    opacity: 0;
+
+    z-index: 2;
+
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+
+    border-radius: 24px;
+    cursor: pointer;
 }

@@ -50,7 +50,7 @@ self.addEventListener('fetch', event => {
     if (request.cache === 'only-if-cached' && request.mode !== 'same-origin')
         return;
 
-    console.log("request for: ", request.url)
+    console.log('request for: ', request.url)
 
     event.respondWith(
         // do network first
@@ -73,16 +73,4 @@ self.addEventListener('fetch', event => {
                     })
             })
     )
-    //     caches.match(request).then(response => {
-    //         if (response)
-    //             return response
-
-    //         return fetch(request)
-    //             .then(response => response)
-    //             .catch(error => {
-    //                 console.log("error at: ", request.url)
-    //                 throw error
-    //             })
-    //     })
-    // )
 })
