@@ -81,8 +81,11 @@ const getCookie = async (name) => {
     return null
 }
 
-board.board = await getCookie('board')
-board.solution = await getCookie('solution')
+let cookieBoard = await getCookie('board')
+if (cookieBoard !== null) {
+    board.board = await getCookie('board')
+    board.solution = await getCookie('solution')
+}
 window.addEventListener('beforeunload', _ => {
     setCookie('board', board.board, 7)
     setCookie('solution', board.solution, 7)
